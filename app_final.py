@@ -21,7 +21,7 @@ savedmodel = pickle.load(open('nb.pkl','rb'))
 tfidfconverter = pickle.load(open('tf01.pkl', 'rb'))
 labelencoder = pickle.load(open('le.pkl', 'rb'))
 
-UPLOAD_FOLDER = r'C:\Users\SANYAM\WIT\PDF Classifier'
+UPLOAD_FOLDER = os.getcwd()
 
 # initialzing flask app
 app = Flask(__name__)
@@ -30,8 +30,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def extractTextFromPDF(pdf_location):
     text = ""
     pdfs = glob.glob(pdf_location)
+    poppler_p = os.path.join(os.getcwd(), "poppler-0.68.0\\bin")
     for pdf_path in pdfs:
-        pages = convert_from_path(pdf_path, 500, poppler_path = r'C:\Program Files\poppler-0.68.0\bin')
+        pages = convert_from_path(pdf_path, 500, poppler_path = poppler_p)
 
         for pageNum,imgBlob in enumerate(pages):
             text_per_page = pytesseract.image_to_string(imgBlob, lang='eng')
@@ -73,7 +74,7 @@ def predict():
     if request.method == 'POST':
         file = request.files['file']
 
-    try:
+    #try:
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         text_string = extractTextFromPDF(filename)
@@ -82,8 +83,8 @@ def predict():
         new_name = category + ".pdf"
         os.rename(old_name, new_name)
         return render_template('index.html', category = category)
-    except:
-        return render_template('index.html')
+    #except:
+        #return render_template('index.html')
         
     
 if __name__ == "__main__":
