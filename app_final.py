@@ -16,12 +16,11 @@ from sklearn.preprocessing import LabelEncoder
 from pdf2image import convert_from_path
 import glob
 import pytesseract
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 savedmodel = pickle.load(open('nb.pkl','rb'))
 tfidfconverter = pickle.load(open('tf01.pkl', 'rb'))
 labelencoder = pickle.load(open('le.pkl', 'rb'))
-
-pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
 
 UPLOAD_FOLDER = os.getcwd()
 
@@ -32,7 +31,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def extractTextFromPDF(pdf_location):
     text = ""
     pdfs = glob.glob(pdf_location)
-    poppler_p = r"C:\Program Files\poppler-0.68.0\bin"
+    
+    poppler_p =  r'C:\Program Files\poppler-0.68.0\bin'
+
+    # poppler_p = os.path.join(os.getcwd(), "\poppler-0.68.0\bin")
     for pdf_path in pdfs:
         pages = convert_from_path(pdf_path, 500, poppler_path = poppler_p)
 
@@ -75,11 +77,9 @@ def predict_topic(text):
 def predict():
     if request.method == 'POST':
         file = request.files['file']
-        filename = secure_filename(file.filename)
 
-        if filename == "":
-            return render_template('index.html')
-            
+    #try:
+        filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         text_string = extractTextFromPDF(filename)
         category = predict_topic(text_string)
@@ -87,6 +87,9 @@ def predict():
         new_name = category + ".pdf"
         os.rename(old_name, new_name)
         return render_template('index.html', category = category)
+    #except:
+    #    return render_template('index.html')
         
+    
 if __name__ == "__main__":
     app.run(debug=True)
