@@ -21,6 +21,8 @@ savedmodel = pickle.load(open('nb.pkl','rb'))
 tfidfconverter = pickle.load(open('tf01.pkl', 'rb'))
 labelencoder = pickle.load(open('le.pkl', 'rb'))
 
+pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
+
 UPLOAD_FOLDER = os.getcwd()
 
 # initialzing flask app
